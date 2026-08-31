@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Café americano", "precio": 5.5, "stock": 20, "categoria": "Bebidas" },
+  { "id": 2, "nombre": "Sandwich mixto", "precio": 8.0, "stock": 12, "categoria": "Comida" },
+  { "id": 3, "nombre": "Jugo de naranja", "precio": 6.0, "stock": 15, "categoria": "Bebidas" }
+]
