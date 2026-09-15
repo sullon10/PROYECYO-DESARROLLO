@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "nombres": "Juan",
+    "apellidos": "Pérez",
+    "correo": "juan.perez@cafeteria.com",
+    "contraseña": "123456",
+    "rol": "vendedor",
+    "estado": true
+  },
+  {
+    "id": 2,
+    "nombres": "María",
+    "apellidos": "López",
+    "correo": "maria.lopez@cafeteria.com",
+    "contraseña": "123456",
+    "rol": "vendedor",
+    "estado": true
+  },
+  {
+    "id": 3,
+    "nombres": "Administrador",
+    "apellidos": "Sistema",
+    "correo": "admin@cafeteria.com",
+    "contraseña": "admin123",
+    "rol": "administrador",
+    "estado": true
+  }
+]
