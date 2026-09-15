@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const adminRoutes = require('./admin/routes/adminRoutes');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/api/admin', adminRoutes);
 
 // Ruta de prueba para verificar que el servidor levanta correctamente
 app.get('/api/status', (req, res) => {
