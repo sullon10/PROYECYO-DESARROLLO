@@ -1,3 +1,4 @@
+// backend/services/VentaService.js
 const Venta = require('../models/Venta');
 const ProductoRepository = require('../repositories/ProductoRepository');
 const VentaRepository = require('../repositories/VentaRepository');
@@ -9,7 +10,6 @@ class VentaService {
   }
 
   registrarVenta({ vendedorId, items }) {
-    // 1. Validar stock de TODOS los items antes de modificar nada
     const productosAVender = items.map((item) => {
       const producto = this.productoRepo.obtenerPorId(item.productoId);
       if (!producto.tieneStockSuficiente(item.cantidad)) {
@@ -20,13 +20,11 @@ class VentaService {
       return { producto, cantidad: item.cantidad };
     });
 
-    // 2. Descontar stock de cada producto y persistirlo
     productosAVender.forEach(({ producto, cantidad }) => {
       producto.descontarStock(cantidad);
       this.productoRepo.actualizarStock(producto.id, producto.stock);
     });
 
-    // 3. Armar y guardar la venta
     const itemsVenta = productosAVender.map(({ producto, cantidad }) => ({
       productoId: producto.id,
       nombre: producto.nombre,
@@ -45,6 +43,24 @@ class VentaService {
 
   obtenerHistorial() {
     return this.ventaRepo.obtenerTodas();
+  }
+
+  obtenerReporte() {
+    const ventas = this.ventaRepo.obtenerTodas();
+    const totalGeneral = +ventas.reduce((s, v) => s + v.total, 0).toFixed(2);
+
+    const porProducto = {};
+    ventas.forEach((venta) => {
+      venta.items.forEach((item) => {
+        if (!porProducto[item.nombre]) {
+          porProducto[item.nombre] = { cantidadVendida: 0, totalGenerado: 0 };
+        }
+        porProducto[item.nombre].cantidadVendida += item.cantidad;
+        porProducto[item.nombre].totalGenerado += item.subtotal;
+      });
+    });
+
+    return { totalVentas: ventas.length, totalGeneral, porProducto };
   }
 }
 
