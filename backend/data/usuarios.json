@@ -2,28 +2,37 @@
   {
     "id": 1,
     "nombres": "Juan",
-    "apellidos": "Pérez",
+    "apellidos": "P├®rez",
     "correo": "juan.perez@cafeteria.com",
-    "contraseña": "123456",
     "rol": "vendedor",
-    "estado": true
+    "estado": true,
+    "contraseña": "$2b$10$vuq.e1z0mv4HQ3pFHSYVie26AAxpSM9qrDL5h11qV9X.K4S2b6zWu"
   },
   {
     "id": 2,
-    "nombres": "María",
-    "apellidos": "López",
+    "nombres": "Mar├¡a",
+    "apellidos": "L├│pez",
     "correo": "maria.lopez@cafeteria.com",
-    "contraseña": "123456",
     "rol": "vendedor",
-    "estado": true
+    "estado": true,
+    "contraseña": "$2b$10$tIgJItGwouSTYfZBdocWqOOe.3ac8eD66S/ZDz/oWEWQ7Ipwpzh1O"
   },
   {
     "id": 3,
     "nombres": "Administrador",
     "apellidos": "Sistema",
     "correo": "admin@cafeteria.com",
-    "contraseña": "admin123",
     "rol": "administrador",
-    "estado": true
+    "estado": true,
+    "contraseña": "$2b$12$QjQ.qX8BwONopM6kgPOUf.OO.b3MVYMaZsLisluT79Z99ZUY2Mf4m"
+  },
+  {
+    "id": 4,
+    "nombres": "Dasl",
+    "apellidos": "",
+    "correo": "dasl@cafeteria.com",
+    "rol": "vendedor",
+    "estado": true,
+    "contraseña": ""
   }
 ]

@@ -1,9 +1,15 @@
 
-const API_URL = 'http://localhost:3001/api/admin';
+const API_URL = 'http://localhost:3001/api';
+const API_ADMIN = `${API_URL}/admin`;
 
-// Obtener el token JWT del administrador
+// ====================================
+// AUTENTICACIÓN DEL ADMINISTRADOR
+// ====================================
+
 export const obtenerHeadersAdmin = () => {
-  const token = sessionStorage.getItem('adminToken');
+  const token =
+    sessionStorage.getItem('token') ||
+    sessionStorage.getItem('adminToken');
 
   return {
     'Content-Type': 'application/json',
@@ -11,9 +17,9 @@ export const obtenerHeadersAdmin = () => {
   };
 };
 
-// Función reutilizable para las solicitudes del administrador
+// Solicitudes protegidas del Administrador
 const solicitarAdmin = async (ruta, opciones = {}) => {
-  const respuesta = await fetch(`${API_URL}${ruta}`, {
+  const respuesta = await fetch(`${API_ADMIN}${ruta}`, {
     ...opciones,
     headers: {
       ...obtenerHeadersAdmin(),
@@ -34,24 +40,33 @@ const solicitarAdmin = async (ruta, opciones = {}) => {
       );
     }
 
-    throw new Error(
-      `Error al procesar la solicitud (${respuesta.status})`
-    );
+    let mensaje = `Error al procesar la solicitud (${respuesta.status})`;
+
+    try {
+      const datos = await respuesta.json();
+      mensaje = datos.mensaje || datos.error || mensaje;
+    } catch {
+      // Conservar el mensaje predeterminado
+    }
+
+    throw new Error(mensaje);
+  }
+
+  if (respuesta.status === 204) {
+    return null;
   }
 
   return respuesta.json();
 };
 
 // ====================================
-// GESTIÓN DE PRODUCTOS
+// ADMINISTRADOR: GESTIÓN DE PRODUCTOS
 // ====================================
 
-// Obtener todos los productos
 export const obtenerProductosAdmin = async () => {
   return solicitarAdmin('/productos');
 };
 
-// Crear un producto
 export const crearProducto = async (producto) => {
   return solicitarAdmin('/productos', {
     method: 'POST',
@@ -59,7 +74,6 @@ export const crearProducto = async (producto) => {
   });
 };
 
-// Actualizar un producto
 export const actualizarProducto = async (id, producto) => {
   return solicitarAdmin(`/productos/${id}`, {
     method: 'PUT',
@@ -67,7 +81,6 @@ export const actualizarProducto = async (id, producto) => {
   });
 };
 
-// Eliminar un producto
 export const eliminarProducto = async (id) => {
   return solicitarAdmin(`/productos/${id}`, {
     method: 'DELETE'
@@ -75,15 +88,13 @@ export const eliminarProducto = async (id) => {
 };
 
 // ====================================
-// GESTIÓN DE VENDEDORES
+// ADMINISTRADOR: GESTIÓN DE VENDEDORES
 // ====================================
 
-// Obtener vendedores
 export const obtenerVendedores = async () => {
   return solicitarAdmin('/vendedores');
 };
 
-// Registrar vendedor
 export const crearVendedor = async (email, nombre) => {
   return solicitarAdmin('/vendedores', {
     method: 'POST',
@@ -91,7 +102,6 @@ export const crearVendedor = async (email, nombre) => {
   });
 };
 
-// Activar o desactivar vendedor
 export const actualizarVendedor = async (id, datos) => {
   return solicitarAdmin(`/vendedores/${id}`, {
     method: 'PUT',
@@ -99,7 +109,6 @@ export const actualizarVendedor = async (id, datos) => {
   });
 };
 
- // Eliminar vendedor
 export const eliminarVendedor = async (id) => {
   return solicitarAdmin(`/vendedores/${id}`, {
     method: 'DELETE'
@@ -107,10 +116,58 @@ export const eliminarVendedor = async (id) => {
 };
 
 // ====================================
-// REPORTES DEL ADMINISTRADOR
+// ADMINISTRADOR: REPORTES
 // ====================================
 
-// Obtener reporte de ventas
 export const obtenerReporteAdmin = async () => {
   return solicitarAdmin('/reportes');
 };
+
+// ====================================
+// CLIENTE Y VENDEDOR: PRODUCTOS
+// ====================================
+
+export async function obtenerProductos() {
+  const respuesta = await fetch(`${API_URL}/productos`);
+
+  if (!respuesta.ok) {
+    throw new Error('Error al obtener productos');
+  }
+
+  return respuesta.json();
+}
+
+// ====================================
+// VENDEDOR: REGISTRAR VENTAS
+// ====================================
+
+export async function registrarVenta({ vendedorId, items }) {
+  const respuesta = await fetch(`${API_URL}/ventas`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      vendedorId,
+      items
+    })
+  });
+
+  let datos;
+
+  try {
+    datos = await respuesta.json();
+  } catch {
+    throw new Error('El servidor devolvió una respuesta inválida');
+  }
+
+  if (!respuesta.ok) {
+    throw new Error(
+      datos.error ||
+      datos.mensaje ||
+      'Error al registrar la venta'
+    );
+  }
+
+  return datos;
+}

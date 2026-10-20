@@ -22,16 +22,35 @@ const login = async (req, res) => {
       (u) => u.correo.toLowerCase() === correo.trim().toLowerCase()
     );
 
-    if (!usuario || !usuario.estado || usuario.rol !== 'administrador') {
-      return res.status(401).json({
-        mensaje: 'Credenciales inválidas'
-      });
-    }
 
-    const contraseñaValida = await bcrypt.compare(
-      contraseña,
-      usuario.contraseña
-    );
+     const rolesPermitidos = ['administrador', 'admin', 'cliente', 'vendedor'];
+
+     if (
+       !usuario ||
+        usuario.estado !== true ||
+       !rolesPermitidos.includes(usuario.rol)
+    ) {
+        return res.status(401).json({
+         mensaje: 'Credenciales inválidas'
+     });
+   }
+
+    
+if (
+  typeof usuario.contraseña !== 'string' ||
+  !/^\$2[aby]\$/.test(usuario.contraseña)
+) {
+  return res.status(401).json({
+    mensaje: 'Credenciales inválidas'
+  });
+}
+
+const contraseñaValida = await bcrypt.compare(
+  contraseña,
+  usuario.contraseña
+);
+
+    
 
     if (!contraseñaValida) {
       return res.status(401).json({
