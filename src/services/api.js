@@ -16,3 +16,15 @@ export async function registrarVenta({ vendedorId, items }) {
   if (!res.ok) throw new Error(data.error || 'Error al registrar la venta');
   return data;
 }
+
+export async function obtenerHistorialVentas() {
+  const res = await fetch(`${API_URL}/ventas`);
+  if (!res.ok) throw new Error('Error al obtener el historial de ventas');
+  return res.json();
+}
+
+export async function obtenerReporteVentas() {
+  const res = await fetch(`${API_URL}/ventas/reporte`);
+  if (!res.ok) throw new Error('Error al obtener el reporte de ventas');
+  return res.json();
+}
