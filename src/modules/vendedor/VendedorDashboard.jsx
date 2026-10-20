@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { obtenerProductos, registrarVenta } from '../../services/api';
 import ProductoList from './ProductoList';
 import RegistrarVenta from './RegistrarVenta';
+import ReporteVentas from './ReporteVentas';
 
 export default function VendedorDashboard() {
   const { usuario, logout } = useAuth();
@@ -156,9 +157,7 @@ export default function VendedorDashboard() {
         </div>
       )}
 
-      {vista === 'reporte' && (
-        <div className="alert alert-secondary">Reporte: se integra en las proximas semanas</div>
-      )}
+            {vista === 'reporte' && <ReporteVentas />}
     </div>
   );
 }
