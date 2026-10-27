@@ -1,0 +1,55 @@
+.vendedor-theme {
+  --cafe-espresso: #3b2a20;
+  --cafe-caramel: #c68b59;
+  --cafe-caramel-dark: #a66b3d;
+  --cafe-cream: #faf6f1;
+  --cafe-sand: #f0e4d7;
+  --cafe-line: #e4d6c7;
+
+  background-color: var(--cafe-cream);
+  color: #2b1d14;
+  min-height: 100vh;
+}
+
+.vendedor-theme .vendedor-header {
+  background-color: var(--cafe-espresso);
+  color: var(--cafe-cream);
+  border-bottom: 3px solid var(--cafe-caramel);
+}
+
+.vendedor-theme .btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--cafe-caramel);
+  --bs-btn-border-color: var(--cafe-caramel);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--cafe-caramel-dark);
+  --bs-btn-hover-border-color: var(--cafe-caramel-dark);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--cafe-caramel-dark);
+  --bs-btn-active-border-color: var(--cafe-caramel-dark);
+  --bs-btn-disabled-bg: var(--cafe-caramel);
+  --bs-btn-disabled-border-color: var(--cafe-caramel);
+}
+
+.vendedor-theme .nav-pills {
+  --bs-nav-link-color: var(--cafe-espresso);
+  --bs-nav-link-hover-color: var(--cafe-caramel-dark);
+  --bs-nav-pills-link-active-bg: var(--cafe-espresso);
+}
+
+.vendedor-theme .card {
+  border: 1px solid var(--cafe-line);
+  border-top: 3px solid var(--cafe-caramel);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 10px rgba(59, 42, 32, 0.06);
+}
+
+.vendedor-theme .table thead th {
+  background-color: var(--cafe-sand);
+  color: var(--cafe-espresso);
+  border-bottom: 0;
+}
+
+.vendedor-theme .spinner-border {
+  color: var(--cafe-caramel);
+}

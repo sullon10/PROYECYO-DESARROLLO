@@ -25,8 +25,26 @@ export default function ReporteVentas() {
     cargar();
   }, [cargar]);
 
-  if (cargando && !reporte) return <p className="text-muted">Cargando reporte...</p>;
-  if (error) return <div className="alert alert-danger">{error}</div>;
+   if (cargando && !reporte) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger d-flex justify-content-between align-items-center">
+        <span>{error}</span>
+        <button className="btn btn-outline-danger btn-sm" onClick={cargar}>
+          Reintentar
+        </button>
+      </div>
+    );
+  }
 
   const ticketPromedio =
     reporte.totalVentas > 0 ? reporte.totalGeneral / reporte.totalVentas : 0;

@@ -1,30 +1,35 @@
 const API_URL = 'http://localhost:3001/api';
 
-export async function obtenerProductos() {
-  const res = await fetch(`${API_URL}/productos`);
-  if (!res.ok) throw new Error('Error al obtener productos');
-  return res.json();
-}
+async function request(ruta, opciones = {}) {
+  const token = localStorage.getItem('token');
+  const headers = { ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  if (opciones.body) headers['Content-Type'] = 'application/json';
 
-export async function registrarVenta({ vendedorId, items }) {
-  const res = await fetch(`${API_URL}/ventas`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vendedorId, items }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al registrar la venta');
+  let res;
+  try {
+    res = await fetch(`${API_URL}${ruta}`, { ...opciones, headers });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté corriendo.');
+  }
+
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    // respuesta sin cuerpo JSON
+  }
+
+  if (!res.ok) {
+    throw new Error(data?.error || `Error del servidor (${res.status})`);
+  }
   return data;
 }
 
-export async function obtenerHistorialVentas() {
-  const res = await fetch(`${API_URL}/ventas`);
-  if (!res.ok) throw new Error('Error al obtener el historial de ventas');
-  return res.json();
-}
+export const obtenerProductos = () => request('/productos');
 
-export async function obtenerReporteVentas() {
-  const res = await fetch(`${API_URL}/ventas/reporte`);
-  if (!res.ok) throw new Error('Error al obtener el reporte de ventas');
-  return res.json();
-}
+export const registrarVenta = ({ vendedorId, items }) =>
+  request('/ventas', { method: 'POST', body: JSON.stringify({ vendedorId, items }) });
+
+export const obtenerHistorialVentas = () => request('/ventas');
+
+export const obtenerReporteVentas = () => request('/ventas/reporte');
