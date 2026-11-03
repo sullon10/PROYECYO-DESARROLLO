@@ -1,12 +1,34 @@
+
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function RutaProtegida({ rolRequerido, children }) {
-  const { usuario, cargando } = useAuth();
+  const { usuario, token, cargando } = useAuth();
 
-  if (cargando) return <p>Cargando...</p>;
-  if (!usuario) return <Navigate to="/login" replace />;
-  if (rolRequerido && usuario.rol !== rolRequerido) return <Navigate to="/login" replace />;
+  if (cargando) {
+    return <p>Cargando...</p>;
+  }
+
+  if (!usuario || !token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const normalizarRol = (rol) => {
+    const valor = String(rol || '').toLowerCase();
+
+    if (valor === 'administrador') {
+      return 'admin';
+    }
+
+    return valor;
+  };
+
+  const rolUsuario = normalizarRol(usuario.rol);
+  const rolPermitido = normalizarRol(rolRequerido);
+
+  if (rolRequerido && rolUsuario !== rolPermitido) {
+    return <Navigate to="/" replace />;
+  }
 
   return children;
 }

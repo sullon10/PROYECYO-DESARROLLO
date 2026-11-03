@@ -1,55 +1,148 @@
-import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext();
+import {
+  createContext,
+  useContext,
+  useState
+} from 'react';
+
+const AuthContext = createContext(null);
 
 const API_URL = 'http://localhost:3001/api';
 
+function obtenerSesionGuardada() {
+  try {
+    // Recuperar sesiones anteriores del Administrador
+    const token =
+      sessionStorage.getItem('token') ||
+      sessionStorage.getItem('adminToken') ||
+      localStorage.getItem('token');
+
+    const usuarioGuardado =
+      sessionStorage.getItem('usuario') ||
+      sessionStorage.getItem('adminUsuario') ||
+      localStorage.getItem('usuario');
+
+    return {
+      token: token || null,
+      usuario: token && usuarioGuardado
+        ? JSON.parse(usuarioGuardado)
+        : null
+    };
+  } catch {
+    return {
+      token: null,
+      usuario: null
+    };
+  }
+}
+
 export function AuthProvider({ children }) {
-  const [usuario, setUsuario] = useState(null);
-  const [token, setToken] = useState(null);
-  const [cargando, setCargando] = useState(true);
+  const [sesion, setSesion] = useState(obtenerSesionGuardada);
 
-  // Recupera sesión guardada al recargar la página
-  useEffect(() => {
-    const tokenGuardado = localStorage.getItem('token');
-    const usuarioGuardado = localStorage.getItem('usuario');
-    if (tokenGuardado && usuarioGuardado) {
-      setToken(tokenGuardado);
-      setUsuario(JSON.parse(usuarioGuardado));
-    }
-    setCargando(false);
-  }, []);
+  const token = sesion.token;
+  const usuario = sesion.usuario;
 
-  const login = async (email, password) => {
-    const res = await fetch(`${API_URL}/auth/login`, {
+  const [cargando] = useState(false);
+
+  const iniciarSesion = async (correo, contraseña) => {
+    const respuesta = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        correo,
+        contraseña
+      })
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
 
-    setToken(data.token);
-    setUsuario(data.usuario);
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-    return data.usuario;
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+      throw new Error(
+        datos.mensaje ||
+        datos.error ||
+        'Error al iniciar sesión'
+      );
+    }
+
+    if (!datos.token || !datos.usuario) {
+      throw new Error(
+        'La respuesta del servidor no contiene una sesión válida'
+      );
+    }
+
+    // Guardar la sesión de cualquier rol
+    sessionStorage.setItem('token', datos.token);
+    sessionStorage.setItem(
+      'usuario',
+      JSON.stringify(datos.usuario)
+    );
+
+    // Compatibilidad con las claves del módulo Administrador
+    sessionStorage.setItem('adminToken', datos.token);
+    sessionStorage.setItem(
+      'adminUsuario',
+      JSON.stringify(datos.usuario)
+    );
+
+    setSesion({
+      token: datos.token,
+      usuario: datos.usuario
+    });
+
+    return datos.usuario;
   };
 
-  const logout = () => {
-    setToken(null);
-    setUsuario(null);
+  // Alias utilizado por Cliente y Vendedor
+  const login = async (email, password) => {
+    return iniciarSesion(email, password);
+  };
+
+  const cerrarSesion = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('usuario');
+    sessionStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminUsuario');
+
+    // Limpiar sesiones del código anterior
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
+
+    setSesion({
+      token: null,
+      usuario: null
+    });
   };
 
+  const logout = cerrarSesion;
+
   return (
-    <AuthContext.Provider value={{ usuario, token, login, logout, cargando }}>
+    <AuthContext.Provider
+      value={{
+        usuario,
+        token,
+        cargando,
+        iniciarSesion,
+        cerrarSesion,
+        login,
+        logout,
+        autenticado: Boolean(token && usuario)
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const contexto = useContext(AuthContext);
+
+  if (!contexto) {
+    throw new Error(
+      'useAuth debe utilizarse dentro de AuthProvider'
+    );
+  }
+
+  return contexto;
 }
