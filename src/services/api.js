@@ -127,76 +127,40 @@ export const obtenerReporteAdmin = async () => {
 // CLIENTE Y VENDEDOR: PRODUCTOS
 // ====================================
 
-export async function obtenerProductos() {
-  const respuesta = await fetch(`${API_URL}/productos`);
+async function request(ruta, opciones = {}) {
+  const token = localStorage.getItem('token');
+  const headers = { ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  if (opciones.body) headers['Content-Type'] = 'application/json';
 
-  if (!respuesta.ok) {
-    throw new Error('Error al obtener productos');
-  }
-
-  return respuesta.json();
-}
-
-// ====================================
-// VENDEDOR: REGISTRAR VENTAS
-// ====================================
-
-
-export async function registrarVenta({ vendedorId, items }) {
-  const respuesta = await fetch(`${API_URL}/ventas`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      vendedorId,
-      items
-    })
-  });
-
-  let datos;
-
+  let res;
   try {
-    datos = await respuesta.json();
+    res = await fetch(`${API_URL}${ruta}`, { ...opciones, headers });
   } catch {
-    throw new Error('El servidor devolvió una respuesta inválida');
+    throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté corriendo.');
   }
 
-  if (!respuesta.ok) {
-    throw new Error(
-      datos.error ||
-      datos.mensaje ||
-      'Error al registrar la venta'
-    );
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    // respuesta sin cuerpo JSON
   }
 
-  return datos;
+  if (!res.ok) {
+    throw new Error(data?.error || `Error del servidor (${res.status})`);
+  }
+  return data;
 }
 
 // ====================================
 // VENDEDOR: HISTORIAL DE VENTAS
 // ====================================
 
-export async function obtenerHistorialVentas() {
-  const respuesta = await fetch(`${API_URL}/ventas`);
+export const obtenerProductos = () => request('/productos');
 
-  if (!respuesta.ok) {
-    throw new Error('Error al obtener el historial de ventas');
-  }
+export const registrarVenta = ({ vendedorId, items }) =>
+  request('/ventas', { method: 'POST', body: JSON.stringify({ vendedorId, items }) });
 
-  return respuesta.json();
-}
+export const obtenerHistorialVentas = () => request('/ventas');
 
-// ====================================
-// VENDEDOR: REPORTE DE VENTAS
-// ====================================
-
-export async function obtenerReporteVentas() {
-  const respuesta = await fetch(`${API_URL}/ventas/reporte`);
-
-  if (!respuesta.ok) {
-    throw new Error('Error al obtener el reporte de ventas');
-  }
-
-  return respuesta.json();
-}
+export const obtenerReporteVentas = () => request('/ventas/reporte');

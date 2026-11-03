@@ -4,33 +4,47 @@ import { obtenerProductos, registrarVenta } from '../../services/api';
 import ProductoList from './ProductoList';
 import RegistrarVenta from './RegistrarVenta';
 import ReporteVentas from './ReporteVentas';
+import '../../styles/vendedor.css';
 
 export default function VendedorDashboard() {
   const { usuario, logout } = useAuth();
   const [vista, setVista] = useState('vender');
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [cargandoInicial, setCargandoInicial] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState(null);
 
+  // No activa "cargando" en recargas: así el catálogo no se reinicia tras una venta
   const cargarProductos = useCallback(async () => {
     try {
-      setCargando(true);
       const data = await obtenerProductos();
       setProductos(data);
       setError(null);
     } catch (err) {
       setError(err.message);
     } finally {
-      setCargando(false);
+      setCargandoInicial(false);
     }
   }, []);
 
   useEffect(() => {
     cargarProductos();
   }, [cargarProductos]);
+
+  // El aviso de éxito se cierra solo a los 4 segundos
+  useEffect(() => {
+    if (mensaje?.tipo !== 'success') return;
+    const temporizador = setTimeout(() => setMensaje(null), 4000);
+    return () => clearTimeout(temporizador);
+  }, [mensaje]);
+
+  const reintentar = () => {
+    setError(null);
+    setCargandoInicial(true);
+    cargarProductos();
+  };
 
   const stockDe = (productoId) =>
     productos.find((p) => p.id === productoId)?.stock ?? 0;
@@ -67,7 +81,7 @@ export default function VendedorDashboard() {
         .map((item) => {
           if (item.productoId !== productoId) return item;
           const nueva = item.cantidad + delta;
-          if (nueva > stockDe(productoId)) return item; // no pasar del stock
+          if (nueva > stockDe(productoId)) return item;
           return nueva > 0 ? { ...item, cantidad: nueva } : null;
         })
         .filter(Boolean)
@@ -86,78 +100,97 @@ export default function VendedorDashboard() {
       await registrarVenta({ vendedorId: usuario.id, items });
       setCarrito([]);
       setMensaje({ tipo: 'success', texto: 'Venta registrada correctamente' });
-      await cargarProductos();
     } catch (err) {
       setMensaje({ tipo: 'danger', texto: err.message });
     } finally {
       setEnviando(false);
+      cargarProductos(); // éxito o fallo, el stock mostrado queda al día
     }
   };
 
   return (
-    <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Panel de Vendedor</h2>
-        <div>
-          <span className="me-3">Hola, {usuario?.nombre}</span>
-          <button className="btn btn-outline-secondary btn-sm" onClick={logout}>
+    <div className="vendedor-theme">
+      <header className="vendedor-header py-3">
+        <div className="container d-flex justify-content-between align-items-center">
+          <div>
+            <h1 className="h4 mb-0">Panel de Vendedor</h1>
+            <small className="opacity-75">Hola, {usuario?.nombre}</small>
+          </div>
+          <button className="btn btn-outline-light btn-sm" onClick={logout}>
             Cerrar sesión
           </button>
         </div>
-      </div>
+      </header>
 
-      <ul className="nav nav-pills mb-4">
-        <li className="nav-item">
-          <button
-            className={`nav-link ${vista === 'vender' ? 'active' : ''}`}
-            onClick={() => setVista('vender')}
-          >
-            Vender
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${vista === 'reporte' ? 'active' : ''}`}
-            onClick={() => setVista('reporte')}
-          >
-            Reporte
-          </button>
-        </li>
-      </ul>
+      <main className="container py-4">
+        <ul className="nav nav-pills mb-4">
+          <li className="nav-item">
+            <button
+              className={`nav-link ${vista === 'vender' ? 'active' : ''}`}
+              onClick={() => setVista('vender')}
+            >
+              Vender
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link ${vista === 'reporte' ? 'active' : ''}`}
+              onClick={() => setVista('reporte')}
+            >
+              Reporte
+            </button>
+          </li>
+        </ul>
 
-      {mensaje && (
-        <div className={`alert alert-${mensaje.tipo} alert-dismissible`} role="alert">
-          {mensaje.texto}
-          <button type="button" className="btn-close" onClick={() => setMensaje(null)}></button>
-        </div>
-      )}
+        {mensaje && (
+          <div className={`alert alert-${mensaje.tipo} alert-dismissible`} role="alert">
+            {mensaje.texto}
+            <button type="button" className="btn-close" onClick={() => setMensaje(null)}></button>
+          </div>
+        )}
 
-      {vista === 'vender' && (
-        <div className="row">
-          <div className="col-lg-7">
-            {cargando && <p className="text-muted">Cargando productos...</p>}
-            {error && <div className="alert alert-danger">{error}</div>}
-            {!cargando && !error && (
-              <ProductoList
-                productos={productos}
+        {vista === 'vender' && (
+          <div className="row">
+            <div className="col-lg-7">
+              {cargandoInicial && (
+                <div className="text-center py-5">
+                  <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Cargando...</span>
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="alert alert-danger d-flex justify-content-between align-items-center">
+                  <span>{error}</span>
+                  <button className="btn btn-outline-danger btn-sm" onClick={reintentar}>
+                    Reintentar
+                  </button>
+                </div>
+              )}
+
+              {!cargandoInicial && productos.length > 0 && (
+                <ProductoList
+                  productos={productos}
+                  carrito={carrito}
+                  onAgregar={agregarAlCarrito}
+                />
+              )}
+            </div>
+            <div className="col-lg-5">
+              <RegistrarVenta
                 carrito={carrito}
-                onAgregar={agregarAlCarrito}
+                enviando={enviando}
+                onCambiarCantidad={cambiarCantidad}
+                onQuitar={quitarDelCarrito}
+                onConfirmar={confirmarVenta}
               />
-            )}
+            </div>
           </div>
-          <div className="col-lg-5">
-            <RegistrarVenta
-              carrito={carrito}
-              enviando={enviando}
-              onCambiarCantidad={cambiarCantidad}
-              onQuitar={quitarDelCarrito}
-              onConfirmar={confirmarVenta}
-            />
-          </div>
-        </div>
-      )}
+        )}
 
-            {vista === 'reporte' && <ReporteVentas />}
+        {vista === 'reporte' && <ReporteVentas />}
+      </main>
     </div>
   );
 }
