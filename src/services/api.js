@@ -164,3 +164,30 @@ export const registrarVenta = ({ vendedorId, items }) =>
 export const obtenerHistorialVentas = () => request('/ventas');
 
 export const obtenerReporteVentas = () => request('/ventas/reporte');
+
+// ====================================
+// PEDIDOS: el cliente los genera, el vendedor los atiende
+// ====================================
+
+export const crearPedido = ({ clienteId, items }) =>
+  request('/pedidos', { method: 'POST', body: JSON.stringify({ clienteId, items }) });
+
+export const obtenerPedidos = () => request('/pedidos');
+
+export const obtenerPedido = (codigo) =>
+  request(`/pedidos/${encodeURIComponent(codigo)}`);
+
+export const obtenerPedidosCliente = (clienteId) =>
+  request(`/pedidos/cliente/${clienteId}`);
+
+export const entregarPedido = (codigo, vendedorId) =>
+  request(`/pedidos/${encodeURIComponent(codigo)}/entregar`, {
+    method: 'PATCH',
+    body: JSON.stringify({ vendedorId }),
+  });
+
+export const cancelarPedido = (codigo) =>
+  request(`/pedidos/${encodeURIComponent(codigo)}/cancelar`, { method: 'PATCH' });
+
+export const reactivarPedido = (codigo) =>
+  request(`/pedidos/${encodeURIComponent(codigo)}/reactivar`, { method: 'PATCH' });

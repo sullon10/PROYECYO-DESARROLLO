@@ -53,3 +53,8 @@
 .vendedor-theme .spinner-border {
   color: var(--cafe-caramel);
 }
+
+.vendedor-theme .list-group {
+  --bs-list-group-active-bg: var(--cafe-espresso);
+  --bs-list-group-active-border-color: var(--cafe-espresso);
+}
