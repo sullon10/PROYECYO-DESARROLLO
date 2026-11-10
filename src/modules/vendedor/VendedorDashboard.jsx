@@ -4,6 +4,7 @@ import { obtenerProductos, registrarVenta } from '../../services/api';
 import ProductoList from './ProductoList';
 import RegistrarVenta from './RegistrarVenta';
 import ReporteVentas from './ReporteVentas';
+import PedidosPanel from './PedidosPanel';
 import '../../styles/vendedor.css';
 
 export default function VendedorDashboard() {
@@ -134,6 +135,14 @@ export default function VendedorDashboard() {
           </li>
           <li className="nav-item">
             <button
+              className={`nav-link ${vista === 'pedidos' ? 'active' : ''}`}
+              onClick={() => setVista('pedidos')}
+            >
+              Pedidos
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
               className={`nav-link ${vista === 'reporte' ? 'active' : ''}`}
               onClick={() => setVista('reporte')}
             >
@@ -188,6 +197,8 @@ export default function VendedorDashboard() {
             </div>
           </div>
         )}
+
+        {vista === 'pedidos' && <PedidosPanel onStockCambio={cargarProductos} />}
 
         {vista === 'reporte' && <ReporteVentas />}
       </main>
