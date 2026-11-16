@@ -27,11 +27,46 @@
       }
     ],
     "total": 58.5,
-    "estado": "pendiente",
+    "estado": "vencido",
     "fechaCreacion": "2026-11-16T01:09:55.169Z",
     "fechaVencimiento": "2026-11-16T02:09:55.169Z",
     "fechaEntrega": null,
     "ventaId": null,
+    "reactivaciones": 0
+  },
+  {
+    "id": 2,
+    "codigo": "PED-1722",
+    "clienteId": 5,
+    "items": [
+      {
+        "productoId": 3,
+        "nombre": "Jugo de naranja",
+        "cantidad": 1,
+        "precioUnitario": 6,
+        "subtotal": 6
+      },
+      {
+        "productoId": 1,
+        "nombre": "Café americano",
+        "cantidad": 1,
+        "precioUnitario": 5.5,
+        "subtotal": 5.5
+      },
+      {
+        "productoId": 2,
+        "nombre": "Sandwich mixto",
+        "cantidad": 1,
+        "precioUnitario": 8,
+        "subtotal": 8
+      }
+    ],
+    "total": 19.5,
+    "estado": "entregado",
+    "fechaCreacion": "2026-11-16T04:29:18.737Z",
+    "fechaVencimiento": "2026-11-16T05:29:18.737Z",
+    "fechaEntrega": "2026-11-16T04:30:21.972Z",
+    "ventaId": 5,
     "reactivaciones": 0
   }
 ]
