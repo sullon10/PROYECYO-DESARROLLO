@@ -12,17 +12,27 @@ import VendedorDashboard from './modules/vendedor/VendedorDashboard';
 import GestionProductos from './modules/admin/GestionProductos';
 import GestionVendedores from './modules/admin/GestionVendedores';
 import ReportesAdmin from './modules/admin/ReportesAdmin';
+import HistorialPedidos from './modules/admin/HistorialPedidos';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
+// ====================================
+// OPCIONES DEL MENÚ ADMINISTRADOR
+// ====================================
+
 const opciones = [
   { id: 'inicio', nombre: 'Panel principal', icono: 'bi-grid-1x2' },
   { id: 'productos', nombre: 'Productos', icono: 'bi-box-seam' },
   { id: 'vendedores', nombre: 'Vendedores', icono: 'bi-people' },
+  { id: 'historial', nombre: 'Historial de Pedidos', icono: 'bi-clock-history' },
   { id: 'reportes', nombre: 'Reportes', icono: 'bi-bar-chart' }
 ];
+
+// ====================================
+// PANEL ADMINISTRADOR
+// ====================================
 
 function PanelAdministrador() {
   const { usuario, cerrarSesion } = useAuth();
@@ -31,6 +41,10 @@ function PanelAdministrador() {
   const tituloActual =
     opciones.find((opcion) => opcion.id === seccion)?.nombre ||
     'Panel principal';
+
+  // ====================================
+  // TARJETAS DEL PANEL PRINCIPAL
+  // ====================================
 
   const tarjetas = [
     {
@@ -48,6 +62,13 @@ function PanelAdministrador() {
       color: 'success'
     },
     {
+      id: 'historial',
+      titulo: 'Historial de Pedidos',
+      descripcion: 'Consulta las ventas y los pedidos registrados.',
+      icono: 'bi-clock-history',
+      color: 'info'
+    },
+    {
       id: 'reportes',
       titulo: 'Reportes de Ventas',
       descripcion: 'Consulta los resultados de ventas.',
@@ -58,9 +79,16 @@ function PanelAdministrador() {
 
   return (
     <div className="admin-layout">
+
+      {/* ====================================
+          MENÚ LATERAL
+      ==================================== */}
+
       <aside className="admin-sidebar">
+
         <div className="admin-logo">
           <i className="bi bi-cup-hot-fill"></i>
+
           <div>
             <strong>CafeteríaWeb</strong>
             <small>Administración</small>
@@ -87,13 +115,21 @@ function PanelAdministrador() {
           ))}
         </nav>
 
+        {/* PERFIL DEL ADMINISTRADOR */}
+
         <div className="admin-sidebar-footer">
+
           <div className="admin-profile">
             <div className="admin-avatar">
               <i className="bi bi-person-fill"></i>
             </div>
+
             <div>
-              <strong>{usuario?.nombres || usuario?.nombre || 'Administrador'}</strong>
+              <strong>
+                {usuario?.nombres ||
+                  usuario?.nombre ||
+                  'Administrador'}
+              </strong>
               <small>Administrador</small>
             </div>
           </div>
@@ -106,46 +142,76 @@ function PanelAdministrador() {
             <i className="bi bi-box-arrow-right"></i>
             Cerrar sesión
           </button>
+
         </div>
       </aside>
 
+      {/* ====================================
+          CONTENIDO PRINCIPAL
+      ==================================== */}
+
       <main className="admin-main">
+
         <header className="admin-header">
+
           <div>
             <div className="admin-breadcrumb">
               CafeteríaWeb / Administración
             </div>
+
             <h1>{tituloActual}</h1>
           </div>
 
           <div className="admin-header-user">
+
             <div className="admin-avatar">
               <i className="bi bi-person-fill"></i>
             </div>
+
             <div>
-              <strong>{usuario?.nombres || usuario?.nombre || 'Administrador'}</strong>
+              <strong>
+                {usuario?.nombres ||
+                  usuario?.nombre ||
+                  'Administrador'}
+              </strong>
               <small>Sesión activa</small>
             </div>
+
           </div>
         </header>
 
         <div className="admin-content">
+
+          {/* ====================================
+              PANEL PRINCIPAL
+          ==================================== */}
+
           {seccion === 'inicio' && (
             <>
+
               <div className="admin-welcome">
+
                 <div>
                   <span className="admin-welcome-label">
                     PANEL ADMINISTRATIVO
                   </span>
+
                   <h2>
-                    ¡Bienvenido, {usuario?.nombres || usuario?.nombre || 'Administrador'}!
+                    ¡Bienvenido,{' '}
+                    {usuario?.nombres ||
+                      usuario?.nombre ||
+                      'Administrador'}!
                   </h2>
+
                   <p>
-                    Gestiona los productos, vendedores y reportes
+                    Gestiona los productos, vendedores,
+                    historial de pedidos y reportes
                     de tu cafetería desde un solo lugar.
                   </p>
                 </div>
+
                 <i className="bi bi-cup-hot-fill admin-welcome-icon"></i>
+
               </div>
 
               <h3 className="admin-section-title">
@@ -153,16 +219,19 @@ function PanelAdministrador() {
               </h3>
 
               <div className="row g-4">
+
                 {tarjetas.map((tarjeta) => (
                   <div
                     className="col-12 col-md-6 col-xl-4"
                     key={tarjeta.id}
                   >
+
                     <button
                       type="button"
                       className="admin-module-card"
                       onClick={() => setSeccion(tarjeta.id)}
                     >
+
                       <div
                         className={`admin-module-icon bg-${tarjeta.color}-subtle text-${tarjeta.color}`}
                       >
@@ -170,18 +239,26 @@ function PanelAdministrador() {
                       </div>
 
                       <h4>{tarjeta.titulo}</h4>
+
                       <p>{tarjeta.descripcion}</p>
 
                       <span className="admin-module-link">
                         Administrar
                         <i className="bi bi-arrow-right"></i>
                       </span>
+
                     </button>
+
                   </div>
                 ))}
+
               </div>
             </>
           )}
+
+          {/* ====================================
+              GESTIÓN DE PRODUCTOS
+          ==================================== */}
 
           {seccion === 'productos' && (
             <section className="admin-content-card">
@@ -189,28 +266,55 @@ function PanelAdministrador() {
             </section>
           )}
 
+          {/* ====================================
+              GESTIÓN DE VENDEDORES
+          ==================================== */}
+
           {seccion === 'vendedores' && (
             <section className="admin-content-card">
               <GestionVendedores />
             </section>
           )}
 
+          {/* ====================================
+              HISTORIAL DE PEDIDOS
+          ==================================== */}
+
+          {seccion === 'historial' && (
+            <section className="admin-content-card">
+              <HistorialPedidos />
+            </section>
+          )}
+
+          {/* ====================================
+              REPORTES DE VENTAS
+          ==================================== */}
+
           {seccion === 'reportes' && (
             <section className="admin-content-card">
               <ReportesAdmin />
             </section>
           )}
+
         </div>
       </main>
     </div>
   );
 }
 
+// ====================================
+// RUTAS PRINCIPALES DE LA APLICACIÓN
+// ====================================
+
 export default function App() {
   const { usuario, cargando } = useAuth();
 
   if (cargando) {
-    return <p className="text-center mt-5">Cargando...</p>;
+    return (
+      <p className="text-center mt-5">
+        Cargando...
+      </p>
+    );
   }
 
   const rutaPorRol = () => {
@@ -218,15 +322,26 @@ export default function App() {
 
     const rol = usuario.rol?.toLowerCase();
 
-    if (rol === 'administrador' || rol === 'admin') return '/admin';
-    if (rol === 'cliente') return '/cliente';
-    if (rol === 'vendedor') return '/vendedor';
+    if (rol === 'administrador' || rol === 'admin') {
+      return '/admin';
+    }
+
+    if (rol === 'cliente') {
+      return '/cliente';
+    }
+
+    if (rol === 'vendedor') {
+      return '/vendedor';
+    }
 
     return '/login';
   };
 
   return (
     <Routes>
+
+      {/* LOGIN */}
+
       <Route
         path="/login"
         element={
@@ -235,6 +350,8 @@ export default function App() {
             : <LoginPage />
         }
       />
+
+      {/* ADMINISTRADOR */}
 
       <Route
         path="/admin"
@@ -245,6 +362,8 @@ export default function App() {
         }
       />
 
+      {/* CLIENTE */}
+
       <Route
         path="/cliente"
         element={
@@ -253,6 +372,8 @@ export default function App() {
           </RutaProtegida>
         }
       />
+
+      {/* VENDEDOR */}
 
       <Route
         path="/vendedor"
@@ -263,15 +384,24 @@ export default function App() {
         }
       />
 
+      {/* RUTA INICIAL */}
+
       <Route
         path="/"
-        element={<Navigate to={rutaPorRol()} replace />}
+        element={
+          <Navigate to={rutaPorRol()} replace />
+        }
       />
+
+      {/* RUTAS NO ENCONTRADAS */}
 
       <Route
         path="*"
-        element={<Navigate to={rutaPorRol()} replace />}
+        element={
+          <Navigate to={rutaPorRol()} replace />
+        }
       />
+
     </Routes>
   );
 }

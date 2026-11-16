@@ -171,3 +171,18 @@ export async function registrarVenta({ vendedorId, items }) {
 
   return datos;
 }
+// ====================================
+// ADMINISTRADOR: HISTORIAL DE PEDIDOS
+// ====================================
+
+export const obtenerHistorialPedidos = async () => {
+  const respuesta = await fetch(`${API_URL}/ventas`, {
+    headers: obtenerHeadersAdmin()
+  });
+
+  if (!respuesta.ok) {
+    throw new Error('Error al obtener el historial de pedidos');
+  }
+
+  return respuesta.json();
+};
