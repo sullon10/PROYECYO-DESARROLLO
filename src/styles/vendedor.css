@@ -1,22 +1,82 @@
 .vendedor-theme {
   --cafe-espresso: #3b2a20;
+  --cafe-espresso-2: #4e392b;
   --cafe-caramel: #c68b59;
   --cafe-caramel-dark: #a66b3d;
   --cafe-cream: #faf6f1;
   --cafe-sand: #f0e4d7;
   --cafe-line: #e4d6c7;
+  --cafe-ink: #2b1d14;
+  --cafe-muted: #7a6657;
 
   background-color: var(--cafe-cream);
-  color: #2b1d14;
+  color: var(--cafe-ink);
   min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
+.vendedor-theme :is(h1, h2, h3, h4, h5, h6),
+.vendedor-theme .font-display {
+  font-family: 'Fraunces', Georgia, serif;
+  color: var(--cafe-espresso);
+}
+
+/* ---------- Cabecera ---------- */
 .vendedor-theme .vendedor-header {
-  background-color: var(--cafe-espresso);
-  color: var(--cafe-cream);
+  background: linear-gradient(135deg, var(--cafe-espresso) 0%, var(--cafe-espresso-2) 100%);
   border-bottom: 3px solid var(--cafe-caramel);
+  color: var(--cafe-cream);
 }
 
+.vendedor-theme .vendedor-header h1 {
+  color: var(--cafe-cream);
+}
+
+.vendedor-theme .vendedor-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--cafe-caramel);
+  color: var(--cafe-espresso);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ---------- Pestañas principales ---------- */
+.vendedor-theme .vendedor-tabs {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  background: #fff;
+  border: 1px solid var(--cafe-line);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(59, 42, 32, 0.06);
+}
+
+.vendedor-theme .vendedor-tabs .nav-link {
+  border-radius: 999px;
+  color: var(--cafe-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+}
+
+.vendedor-theme .vendedor-tabs .nav-link:hover {
+  color: var(--cafe-espresso);
+  background: var(--cafe-sand);
+}
+
+.vendedor-theme .vendedor-tabs .nav-link.active {
+  background: var(--cafe-espresso);
+  color: #fff;
+}
+
+/* ---------- Botones, formularios y listas ---------- */
 .vendedor-theme .btn-primary {
   --bs-btn-color: #fff;
   --bs-btn-bg: var(--cafe-caramel);
@@ -31,30 +91,267 @@
   --bs-btn-disabled-border-color: var(--cafe-caramel);
 }
 
+.vendedor-theme .btn-outline-dark {
+  --bs-btn-color: var(--cafe-espresso);
+  --bs-btn-border-color: var(--cafe-espresso);
+  --bs-btn-hover-bg: var(--cafe-espresso);
+  --bs-btn-hover-border-color: var(--cafe-espresso);
+  --bs-btn-active-bg: var(--cafe-espresso);
+  --bs-btn-active-border-color: var(--cafe-espresso);
+}
+
+.vendedor-theme .form-control:focus,
+.vendedor-theme .form-select:focus {
+  border-color: var(--cafe-caramel);
+  box-shadow: 0 0 0 0.2rem rgba(198, 139, 89, 0.25);
+}
+
 .vendedor-theme .nav-pills {
   --bs-nav-link-color: var(--cafe-espresso);
   --bs-nav-link-hover-color: var(--cafe-caramel-dark);
   --bs-nav-pills-link-active-bg: var(--cafe-espresso);
 }
 
-.vendedor-theme .card {
-  border: 1px solid var(--cafe-line);
-  border-top: 3px solid var(--cafe-caramel);
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 10px rgba(59, 42, 32, 0.06);
+.vendedor-theme .list-group {
+  --bs-list-group-active-bg: var(--cafe-espresso);
+  --bs-list-group-active-border-color: var(--cafe-espresso);
 }
 
-.vendedor-theme .table thead th {
-  background-color: var(--cafe-sand);
-  color: var(--cafe-espresso);
-  border-bottom: 0;
+.vendedor-theme .progress-bar {
+  background-color: var(--cafe-caramel);
 }
 
 .vendedor-theme .spinner-border {
   color: var(--cafe-caramel);
 }
 
-.vendedor-theme .list-group {
-  --bs-list-group-active-bg: var(--cafe-espresso);
-  --bs-list-group-active-border-color: var(--cafe-espresso);
+/* ---------- Tarjetas y tablas ---------- */
+.vendedor-theme .card {
+  border: 1px solid var(--cafe-line);
+  border-top: 3px solid var(--cafe-caramel);
+  border-radius: 0.9rem;
+  box-shadow: 0 2px 10px rgba(59, 42, 32, 0.06);
+}
+
+.vendedor-theme .table {
+  --bs-table-hover-bg: rgba(198, 139, 89, 0.08);
+}
+
+.vendedor-theme .table thead th {
+  background-color: var(--cafe-sand);
+  color: var(--cafe-espresso);
+  border-bottom: 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.vendedor-theme .tabla-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.vendedor-theme .tabla-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* ---------- Catálogo ---------- */
+.vendedor-theme .product-tile {
+  border-top: 1px solid var(--cafe-line);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vendedor-theme .product-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(59, 42, 32, 0.12);
+}
+
+.vendedor-theme .product-tile.agotado {
+  opacity: 0.6;
+}
+
+.vendedor-theme .product-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--cafe-sand);
+  color: var(--cafe-caramel-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.vendedor-theme .price-tag {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--cafe-espresso);
+}
+
+/* ---------- Selector de cantidad ---------- */
+.vendedor-theme .qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--cafe-line);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.vendedor-theme .qty-stepper button {
+  border: 0;
+  background: var(--cafe-sand);
+  color: var(--cafe-espresso);
+  width: 34px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vendedor-theme .qty-stepper button:hover:not(:disabled) {
+  background: var(--cafe-caramel);
+  color: #fff;
+}
+
+.vendedor-theme .qty-stepper button:disabled {
+  opacity: 0.4;
+}
+
+.vendedor-theme .qty-stepper input,
+.vendedor-theme .qty-stepper span {
+  width: 44px;
+  text-align: center;
+  border: 0;
+  font-weight: 600;
+  background: transparent;
+  outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.vendedor-theme .qty-stepper input::-webkit-outer-spin-button,
+.vendedor-theme .qty-stepper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.vendedor-theme .qty-stepper.qty-sm button {
+  width: 28px;
+  height: 28px;
+}
+
+.vendedor-theme .qty-stepper.qty-sm span {
+  width: 32px;
+}
+
+/* ---------- Venta actual ---------- */
+.vendedor-theme .sticky-panel {
+  position: sticky;
+  top: 1rem;
+}
+
+.vendedor-theme .total-line {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--cafe-espresso);
+}
+
+.vendedor-theme .empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--cafe-muted);
+}
+
+.vendedor-theme .empty-state i {
+  display: block;
+  font-size: 2.2rem;
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Pedidos ---------- */
+.vendedor-theme .estado-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* ---------- Reporte ---------- */
+.vendedor-theme .kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--cafe-sand);
+  color: var(--cafe-caramel-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.vendedor-theme .kpi-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cafe-muted);
+}
+
+.vendedor-theme .kpi-value {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cafe-espresso);
+  line-height: 1.15;
+}
+
+.vendedor-theme .bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  min-height: 170px;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.vendedor-theme .bar-col {
+  flex: 1 1 0;
+  min-width: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.vendedor-theme .bar {
+  width: 100%;
+  max-width: 46px;
+  background: linear-gradient(180deg, var(--cafe-caramel), var(--cafe-caramel-dark));
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s ease;
+}
+
+.vendedor-theme .bar.bar-vacia {
+  background: var(--cafe-line);
+}
+
+.vendedor-theme .bar-value,
+.vendedor-theme .bar-label {
+  font-size: 0.7rem;
+  color: var(--cafe-muted);
+  white-space: nowrap;
+}
+
+.vendedor-theme .bar-label {
+  margin-top: 0.25rem;
 }
