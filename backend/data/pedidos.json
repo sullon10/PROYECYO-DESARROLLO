@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "codigo": "PED-4828",
+    "clienteId": 5,
+    "items": [
+      {
+        "productoId": 1,
+        "nombre": "Café americano",
+        "cantidad": 3,
+        "precioUnitario": 5.5,
+        "subtotal": 16.5
+      },
+      {
+        "productoId": 2,
+        "nombre": "Sandwich mixto",
+        "cantidad": 3,
+        "precioUnitario": 8,
+        "subtotal": 24
+      },
+      {
+        "productoId": 3,
+        "nombre": "Jugo de naranja",
+        "cantidad": 3,
+        "precioUnitario": 6,
+        "subtotal": 18
+      }
+    ],
+    "total": 58.5,
+    "estado": "pendiente",
+    "fechaCreacion": "2026-11-16T01:09:55.169Z",
+    "fechaVencimiento": "2026-11-16T02:09:55.169Z",
+    "fechaEntrega": null,
+    "ventaId": null,
+    "reactivaciones": 0
+  }
+]
