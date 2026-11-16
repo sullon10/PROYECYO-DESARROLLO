@@ -141,6 +141,7 @@ export async function obtenerProductos() {
 // VENDEDOR: REGISTRAR VENTAS
 // ====================================
 
+
 export async function registrarVenta({ vendedorId, items }) {
   const respuesta = await fetch(`${API_URL}/ventas`, {
     method: 'POST',
@@ -171,6 +172,8 @@ export async function registrarVenta({ vendedorId, items }) {
 
   return datos;
 }
+
+ 
 // ====================================
 // ADMINISTRADOR: HISTORIAL DE PEDIDOS
 // ====================================
@@ -186,3 +189,31 @@ export const obtenerHistorialPedidos = async () => {
 
   return respuesta.json();
 };
+
+// ====================================
+// VENDEDOR: HISTORIAL DE VENTAS
+// ====================================
+
+export async function obtenerHistorialVentas() {
+  const respuesta = await fetch(`${API_URL}/ventas`);
+
+  if (!respuesta.ok) {
+    throw new Error('Error al obtener el historial de ventas');
+  }
+
+  return respuesta.json();
+}
+
+// ====================================
+// VENDEDOR: REPORTE DE VENTAS
+// ====================================
+
+export async function obtenerReporteVentas() {
+  const respuesta = await fetch(`${API_URL}/ventas/reporte`);
+
+  if (!respuesta.ok) {
+    throw new Error('Error al obtener el reporte de ventas');
+  }
+
+  return respuesta.json();
+}
