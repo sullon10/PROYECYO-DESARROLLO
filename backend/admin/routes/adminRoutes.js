@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const bcrypt = require('bcryptjs');
 
 const { obtenerEstado } = require('../controllers/adminController');
 const productoRepository = require('../repositories/productoRepository');
@@ -118,13 +119,18 @@ router.get('/vendedores', (req, res) => {
 });
 
 // Registrar vendedor
-router.post('/vendedores', (req, res) => {
+router.post('/vendedores', async (req, res) => {
   try {
-    const { nombre, email } = req.body;
+    const { nombre, email, contraseña } = req.body;
 
-    if (!nombre?.trim() || !email?.trim()) {
+    if (
+      !nombre?.trim() ||
+      !email?.trim() ||
+      typeof contraseña !== 'string' ||
+      contraseña.length < 8
+    ) {
       return res.status(400).json({
-        error: 'Nombre y correo son obligatorios'
+        error: 'Nombre, correo y una contraseña de al menos 8 caracteres son obligatorios'
       });
     }
 
@@ -140,7 +146,7 @@ router.post('/vendedores', (req, res) => {
       nombres: nombre.trim(),
       apellidos: '',
       correo: email.trim(),
-      contraseña: '',
+      contraseña: await bcrypt.hash(contraseña, 10),
       rol: 'vendedor',
       estado: true
     });

@@ -95,10 +95,10 @@ export const obtenerVendedores = async () => {
   return solicitarAdmin('/vendedores');
 };
 
-export const crearVendedor = async (email, nombre) => {
+export const crearVendedor = async (email, nombre, contraseña) => {
   return solicitarAdmin('/vendedores', {
     method: 'POST',
-    body: JSON.stringify({ email, nombre })
+    body: JSON.stringify({ email, nombre, contraseña })
   });
 };
 
