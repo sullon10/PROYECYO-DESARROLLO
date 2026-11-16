@@ -44,6 +44,12 @@ export const crearPedidoCliente = ({ clienteId, items }) =>
     body: JSON.stringify({ clienteId, items })
   });
 
+export const actualizarPedidoCliente = (codigo, { clienteId, items }) =>
+  solicitarCliente(`/pedidos/${encodeURIComponent(codigo)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ clienteId, items })
+  });
+
 export const obtenerPedidosCliente = (clienteId) =>
   solicitarCliente(`/pedidos/cliente/${encodeURIComponent(clienteId)}`);
 

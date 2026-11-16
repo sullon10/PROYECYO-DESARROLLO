@@ -11,13 +11,21 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
+  function rutaPorRol(rol) {
+    const rolNormalizado = rol?.toLowerCase();
+    if (rolNormalizado === 'administrador' || rolNormalizado === 'admin') return '/admin';
+    if (rolNormalizado === 'cliente') return '/cliente';
+    if (rolNormalizado === 'vendedor') return '/vendedor';
+    return '/';
+  }
+
   async function manejarLogin(e) {
     e.preventDefault();
     setError('');
     setCargando(true);
     try {
       const usuario = await login(email, password);
-      navigate(`/${usuario.rol}`, { replace: true }); // redirige segun el rol real
+      navigate(rutaPorRol(usuario.rol), { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

@@ -18,6 +18,15 @@ class PedidoController {
     }
   };
 
+  actualizar = (req, res) => {
+    try {
+      const { clienteId, items } = req.body || {};
+      res.json(this.service.actualizarPedido(req.params.codigo, { clienteId, items }));
+    } catch (err) {
+      this._error(res, err);
+    }
+  };
+
   listar = (req, res) => {
     try {
       res.json(this.service.listar({ estado: req.query.estado }));

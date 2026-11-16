@@ -7,6 +7,7 @@ const controller = new PedidoController();
 router.post('/', controller.crear);
 router.get('/', controller.listar);
 router.get('/cliente/:clienteId', controller.listarPorCliente); // antes que '/:codigo'
+router.patch('/:codigo', controller.actualizar);
 router.get('/:codigo', controller.obtenerPorCodigo);
 router.patch('/:codigo/entregar', controller.entregar);
 router.patch('/:codigo/cancelar', controller.cancelar);

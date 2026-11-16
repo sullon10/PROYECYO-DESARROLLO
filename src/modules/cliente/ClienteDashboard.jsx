@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   cancelarPedidoCliente,
   crearPedidoCliente,
+  actualizarPedidoCliente,
   obtenerCatalogo,
   obtenerPedidosCliente
 } from '../../services/clienteApi';
@@ -30,6 +31,7 @@ export default function ClienteDashboard() {
   const [productos, setProductos] = useState([]);
   const [pedidos, setPedidos] = useState([]);
   const [carrito, setCarrito] = useState([]);
+  const [pedidoEditando, setPedidoEditando] = useState(null);
   const [filtro, setFiltro] = useState('Todas');
   const [vista, setVista] = useState('catalogo');
   const [cargando, setCargando] = useState(true);
@@ -119,22 +121,45 @@ export default function ClienteDashboard() {
     setError('');
     setMensaje('');
     try {
-      const pedido = await crearPedidoCliente({
+      const datosPedido = {
         clienteId: usuario.id,
         items: carrito.map((item) => ({
           productoId: item.id,
           cantidad: item.cantidad
         }))
-      });
-      setPedidos((actuales) => [pedido, ...actuales]);
+      };
+      const pedido = pedidoEditando
+        ? await actualizarPedidoCliente(pedidoEditando, datosPedido)
+        : await crearPedidoCliente(datosPedido);
+      setPedidos((actuales) => pedidoEditando
+        ? actuales.map((actual) => actual.codigo === pedido.codigo ? pedido : actual)
+        : [pedido, ...actuales]);
       setCarrito([]);
+      setPedidoEditando(null);
       setVista('pedidos');
-      setMensaje(`Pedido ${pedido.codigo} creado correctamente.`);
+      setMensaje(`Pedido ${pedido.codigo} ${pedidoEditando ? 'actualizado' : 'creado'} correctamente.`);
     } catch (err) {
       setError(err.message);
     } finally {
       setProcesando(false);
     }
+  }
+
+  function editarPedido(pedido) {
+    setCarrito(pedido.items.map((item) => {
+      const producto = productos.find((actual) => actual.id === item.productoId);
+      return {
+        ...(producto || {}),
+        id: item.productoId,
+        nombre: item.nombre,
+        precio: item.precioUnitario,
+        cantidad: item.cantidad
+      };
+    }));
+    setPedidoEditando(pedido.codigo);
+    setMensaje(`Editando ${pedido.codigo}. Ajusta los productos y confirma los cambios.`);
+    setError('');
+    setVista('catalogo');
   }
 
   async function cancelarPedido(codigo) {
@@ -218,6 +243,15 @@ export default function ClienteDashboard() {
                   <i className="bi bi-arrow-clockwise" aria-hidden="true"></i>
                 </button>
               </div>
+              {pedidoEditando && (
+                <div className="editing-order-banner" role="status">
+                  <i className="bi bi-pencil-square" aria-hidden="true"></i>
+                  Editando {pedidoEditando}
+                  <button type="button" onClick={() => { setPedidoEditando(null); setCarrito([]); }}>
+                    Cancelar edición
+                  </button>
+                </div>
+              )}
               <div className="filters" aria-label="Filtrar por categoría">
                 {categorias.map((categoria) => (
                   <button
@@ -336,9 +370,14 @@ export default function ClienteDashboard() {
                     <div className="order-card-footer">
                       <strong>Total {dinero(pedido.total)}</strong>
                       {pedido.estado === 'pendiente' && (
-                        <button type="button" className="cancel-order" onClick={() => cancelarPedido(pedido.codigo)} disabled={procesando}>
-                          Cancelar pedido
-                        </button>
+                        <div className="order-actions">
+                          <button type="button" className="edit-order" onClick={() => editarPedido(pedido)} disabled={procesando}>
+                            <i className="bi bi-pencil" aria-hidden="true"></i> Editar
+                          </button>
+                          <button type="button" className="cancel-order" onClick={() => cancelarPedido(pedido.codigo)} disabled={procesando}>
+                            Cancelar pedido
+                          </button>
+                        </div>
                       )}
                     </div>
                   </article>
