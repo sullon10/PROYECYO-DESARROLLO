@@ -9,7 +9,7 @@ class VentaService {
     this.ventaRepo = new VentaRepository();
   }
 
-  registrarVenta({ vendedorId, items }) {
+    registrarVenta({ vendedorId, items, pedidoId = null, clienteId = null }) {
     const productosAVender = items.map((item) => {
       const producto = this.productoRepo.obtenerPorId(item.productoId);
       if (!producto.tieneStockSuficiente(item.cantidad)) {
@@ -32,10 +32,12 @@ class VentaService {
       precioUnitario: producto.precio,
     }));
 
-    const venta = new Venta({
+   const venta = new Venta({
       id: this.ventaRepo.siguienteId(),
       vendedorId,
       items: itemsVenta,
+      pedidoId,
+      clienteId,
     });
 
     return this.ventaRepo.guardar(venta);

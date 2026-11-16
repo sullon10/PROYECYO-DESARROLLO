@@ -12,12 +12,14 @@ const verificarAdmin = require('./admin/middlewares/verificarAdmin');
 // Rutas de productos y ventas del proyecto grupal
 const productosRoutes = require('./routes/productos.routes');
 const ventasRoutes = require('./routes/ventas.routes');
+const pedidosRoutes = require('./routes/pedidos.routes');
 
 const app = express();
 
 // Middlewares generales
 app.use(cors());
 app.use(express.json());
+app.use('/api/pedidos', pedidosRoutes);   
 
 // Autenticación con JWT
 app.use('/api/auth', authRoutes);
