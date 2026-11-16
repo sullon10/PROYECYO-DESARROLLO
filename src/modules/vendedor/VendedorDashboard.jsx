@@ -1,14 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { obtenerProductos, registrarVenta } from '../../services/api';
+import usePedidos from './UsePedidos';
 import ProductoList from './ProductoList';
 import RegistrarVenta from './RegistrarVenta';
-import ReporteVentas from './ReporteVentas';
 import PedidosPanel from './PedidosPanel';
+import ReporteVentas from './ReporteVentas';
 import '../../styles/vendedor.css';
+
+const TABS = [
+  { id: 'vender', etiqueta: 'Vender', icono: 'bi-cart3' },
+  { id: 'pedidos', etiqueta: 'Pedidos', icono: 'bi-bag-check' },
+  { id: 'reporte', etiqueta: 'Reporte', icono: 'bi-bar-chart-line' },
+];
+
+const cap = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
 export default function VendedorDashboard() {
   const { usuario, logout } = useAuth();
+  const {
+    pedidos,
+    cargando: cargandoPedidos,
+    error: errorPedidos,
+    recargar: recargarPedidos,
+  } = usePedidos();
+
   const [vista, setVista] = useState('vender');
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
@@ -16,6 +32,11 @@ export default function VendedorDashboard() {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState(null);
+
+  const pendientes = pedidos.filter((p) => p.estado === 'pendiente').length;
+  const fechaHoy = cap(
+    new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })
+  );
 
   // No activa "cargando" en recargas: así el catálogo no se reinicia tras una venta
   const cargarProductos = useCallback(async () => {
@@ -47,8 +68,7 @@ export default function VendedorDashboard() {
     cargarProductos();
   };
 
-  const stockDe = (productoId) =>
-    productos.find((p) => p.id === productoId)?.stock ?? 0;
+  const stockDe = (productoId) => productos.find((p) => p.id === productoId)?.stock ?? 0;
 
   const agregarAlCarrito = (producto, cantidad) => {
     const yaEnCarrito = carrito.find((i) => i.productoId === producto.id)?.cantidad || 0;
@@ -93,6 +113,8 @@ export default function VendedorDashboard() {
     setCarrito((prev) => prev.filter((i) => i.productoId !== productoId));
   };
 
+  const vaciarCarrito = () => setCarrito([]);
+
   const confirmarVenta = async () => {
     if (carrito.length === 0 || enviando) return;
     try {
@@ -113,42 +135,46 @@ export default function VendedorDashboard() {
     <div className="vendedor-theme">
       <header className="vendedor-header py-3">
         <div className="container d-flex justify-content-between align-items-center">
-          <div>
-            <h1 className="h4 mb-0">Panel de Vendedor</h1>
-            <small className="opacity-75">Hola, {usuario?.nombre}</small>
+          <div className="d-flex align-items-center gap-3">
+            <div className="vendedor-avatar">
+              {usuario?.nombre?.charAt(0).toUpperCase() || 'V'}
+            </div>
+            <div>
+              <small className="text-uppercase opacity-75" style={{ letterSpacing: '0.08em' }}>
+                <i className="bi bi-cup-hot-fill me-1"></i>CafeteriaWeb
+              </small>
+              <h1 className="h4 mb-0">Panel de Vendedor</h1>
+              <small className="opacity-75">Hola, {usuario?.nombre}</small>
+            </div>
           </div>
-          <button className="btn btn-outline-light btn-sm" onClick={logout}>
-            Cerrar sesión
-          </button>
+          <div className="d-flex align-items-center gap-3">
+            <small className="opacity-75 d-none d-md-inline">
+              <i className="bi bi-calendar3 me-1"></i>
+              {fechaHoy}
+            </small>
+            <button className="btn btn-outline-light btn-sm" onClick={logout}>
+              <i className="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="container py-4">
-        <ul className="nav nav-pills mb-4">
-          <li className="nav-item">
-            <button
-              className={`nav-link ${vista === 'vender' ? 'active' : ''}`}
-              onClick={() => setVista('vender')}
-            >
-              Vender
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${vista === 'pedidos' ? 'active' : ''}`}
-              onClick={() => setVista('pedidos')}
-            >
-              Pedidos
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${vista === 'reporte' ? 'active' : ''}`}
-              onClick={() => setVista('reporte')}
-            >
-              Reporte
-            </button>
-          </li>
+        <ul className="nav vendedor-tabs mb-4">
+          {TABS.map((t) => (
+            <li className="nav-item" key={t.id}>
+              <button
+                className={`nav-link ${vista === t.id ? 'active' : ''}`}
+                onClick={() => setVista(t.id)}
+              >
+                <i className={`bi ${t.icono}`}></i>
+                {t.etiqueta}
+                {t.id === 'pedidos' && pendientes > 0 && (
+                  <span className="badge rounded-pill text-bg-danger">{pendientes}</span>
+                )}
+              </button>
+            </li>
+          ))}
         </ul>
 
         {mensaje && (
@@ -192,15 +218,30 @@ export default function VendedorDashboard() {
                 enviando={enviando}
                 onCambiarCantidad={cambiarCantidad}
                 onQuitar={quitarDelCarrito}
+                onVaciar={vaciarCarrito}
                 onConfirmar={confirmarVenta}
               />
             </div>
           </div>
         )}
 
-        {vista === 'pedidos' && <PedidosPanel onStockCambio={cargarProductos} />}
+        {vista === 'pedidos' && (
+          <PedidosPanel
+            pedidos={pedidos}
+            cargando={cargandoPedidos}
+            error={errorPedidos}
+            onRecargar={recargarPedidos}
+            onStockCambio={cargarProductos}
+          />
+        )}
 
-        {vista === 'reporte' && <ReporteVentas />}
+        {vista === 'reporte' && (
+          <ReporteVentas
+            pedidos={pedidos}
+            errorPedidos={errorPedidos}
+            onRecargarPedidos={recargarPedidos}
+          />
+        )}
       </main>
     </div>
   );
