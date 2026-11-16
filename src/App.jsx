@@ -6,6 +6,7 @@ import { useAuth } from './context/AuthContext';
 import RutaProtegida from './components/RutaProtegida';
 
 import LoginPage from './pages/LoginPage';
+import RegistroPage from './pages/RegistroPage';
 import InicioPage from './pages/InicioPage';
 import CatalogoPublico from './pages/CatalogoPublico';
 import ClienteDashboard from './modules/cliente/ClienteDashboard';
@@ -236,6 +237,11 @@ export default function App() {
             ? <Navigate to={rutaPorRol()} replace />
             : <LoginPage />
         }
+      />
+
+      <Route
+        path="/registro"
+        element={usuario ? <Navigate to={rutaPorRol()} replace /> : <RegistroPage />}
       />
 
       <Route path="/catalogo" element={<CatalogoPublico />} />

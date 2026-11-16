@@ -40,11 +40,14 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Iniciar servidor
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(
-    `Servidor de CafeteriaWeb corriendo en http://localhost:${PORT}`
-  );
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(
+      `Servidor de CafeteriaWeb corriendo en http://localhost:${PORT}`
+    );
+  });
+}
+
+module.exports = app;

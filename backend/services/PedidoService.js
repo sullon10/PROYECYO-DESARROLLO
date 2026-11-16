@@ -98,9 +98,11 @@ class PedidoService {
       .map((p) => this._presentar(p));
   }
 
-  obtenerPorCodigo(codigo) {
+  obtenerPorCodigo(codigo, clienteId) {
     this.expirarVencidos();
-    return this._presentar(this._obtener(codigo));
+    const pedido = this._obtener(codigo);
+    this._exigirPropietario(pedido, clienteId);
+    return this._presentar(pedido);
   }
 
   // ---------- ACCIONES (vendedor) ----------
@@ -131,9 +133,10 @@ class PedidoService {
     return { pedido: this._presentar(pedido), venta };
   }
 
-  cancelarPedido(codigo) {
+  cancelarPedido(codigo, clienteId) {
     this.expirarVencidos();
     const pedido = this._obtener(codigo);
+    this._exigirPropietario(pedido, clienteId);
     this._exigirEstado(pedido, 'pendiente', 'cancelar');
 
     pedido.estado = 'cancelado';
@@ -235,6 +238,12 @@ class PedidoService {
       `No se puede ${accion} el pedido ${pedido.codigo}: ${motivos[pedido.estado]}.`,
       409
     );
+  }
+
+  _exigirPropietario(pedido, clienteId) {
+    if (clienteId !== undefined && String(pedido.clienteId) !== String(clienteId)) {
+      throw new PedidoError('No puedes acceder a un pedido de otro cliente.', 403);
+    }
   }
 
   _generarCodigo() {

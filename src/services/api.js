@@ -128,7 +128,10 @@ export const obtenerReporteAdmin = async () => {
 // ====================================
 
 async function request(ruta, opciones = {}) {
-  const token = localStorage.getItem('token');
+  const token =
+    sessionStorage.getItem('token') ||
+    sessionStorage.getItem('adminToken') ||
+    localStorage.getItem('token');
   const headers = { ...(token ? { Authorization: `Bearer ${token}` } : {}) };
   if (opciones.body) headers['Content-Type'] = 'application/json';
 

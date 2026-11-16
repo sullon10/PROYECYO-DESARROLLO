@@ -58,6 +58,11 @@ export default function ClienteDashboard() {
     0
   );
 
+  const totalUnidades = carrito.reduce(
+    (total, item) => total + item.cantidad,
+    0
+  );
+
   const cargarDatos = useCallback(async () => {
     setCargando(true);
     setError('');
@@ -68,6 +73,10 @@ export default function ClienteDashboard() {
       ]);
       setProductos(catalogo);
       setPedidos(historial);
+      const vencidos = historial.filter((pedido) => pedido.estado === 'vencido');
+      if (vencidos.length > 0) {
+        setMensaje(`${vencidos.length} pedido${vencidos.length > 1 ? 's' : ''} vencido${vencidos.length > 1 ? 's' : ''}. Revisa Mis pedidos para ver el detalle.`);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -163,6 +172,7 @@ export default function ClienteDashboard() {
   }
 
   async function cancelarPedido(codigo) {
+    if (!window.confirm(`¿Seguro que deseas cancelar el pedido ${codigo}?`)) return;
     setProcesando(true);
     setError('');
     try {
@@ -299,7 +309,7 @@ export default function ClienteDashboard() {
               <div className="section-header">
                 <div>
                   <span className="client-section-label">TU SELECCIÓN</span>
-                  <h2>Carrito <span className="cart-badge">{carrito.length}</span></h2>
+                  <h2>Carrito <span className="cart-badge">{totalUnidades}</span></h2>
                 </div>
               </div>
               {carrito.length === 0 ? (
@@ -314,6 +324,7 @@ export default function ClienteDashboard() {
                       <div>
                         <strong>{item.nombre}</strong>
                         <span>{dinero(item.precio)} c/u</span>
+                        <small>Subtotal: {dinero(item.precio * item.cantidad)}</small>
                       </div>
                       <div className="quantity-controls">
                         <button type="button" onClick={() => cambiarCantidad(item.id, -1)} aria-label={`Reducir ${item.nombre}`}>-</button>
@@ -331,7 +342,9 @@ export default function ClienteDashboard() {
                 <div><span>Total estimado</span><strong>{dinero(totalCarrito)}</strong></div>
                 <button type="button" className="checkout-button" onClick={confirmarPedido} disabled={procesando || carrito.length === 0}>
                   <i className="bi bi-check2-circle" aria-hidden="true"></i>
-                  {procesando ? 'Procesando...' : 'Crear pedido'}
+                  {procesando
+                    ? 'Procesando...'
+                    : pedidoEditando ? 'Actualizar pedido' : 'Crear pedido'}
                 </button>
               </div>
             </aside>
@@ -367,6 +380,12 @@ export default function ClienteDashboard() {
                         </div>
                       ))}
                     </div>
+                    {pedido.estado === 'vencido' && (
+                      <p className="order-expired-message">
+                        <i className="bi bi-clock-history" aria-hidden="true"></i>
+                        Este pedido venció y ya no puede editarse.
+                      </p>
+                    )}
                     <div className="order-card-footer">
                       <strong>Total {dinero(pedido.total)}</strong>
                       {pedido.estado === 'pendiente' && (

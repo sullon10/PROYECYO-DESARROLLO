@@ -99,6 +99,26 @@ export function AuthProvider({ children }) {
     return iniciarSesion(email, password);
   };
 
+  const registrarCliente = async (datosRegistro) => {
+    const respuesta = await fetch(`${API_URL}/auth/registro`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(datosRegistro)
+    });
+
+    const datos = await respuesta.json();
+    if (!respuesta.ok) {
+      throw new Error(datos.mensaje || 'No se pudo crear la cuenta');
+    }
+
+    sessionStorage.setItem('token', datos.token);
+    sessionStorage.setItem('usuario', JSON.stringify(datos.usuario));
+    setSesion({ token: datos.token, usuario: datos.usuario });
+    return datos.usuario;
+  };
+
   const cerrarSesion = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('usuario');
@@ -124,6 +144,7 @@ export function AuthProvider({ children }) {
         token,
         cargando,
         iniciarSesion,
+        registrarCliente,
         cerrarSesion,
         login,
         logout,

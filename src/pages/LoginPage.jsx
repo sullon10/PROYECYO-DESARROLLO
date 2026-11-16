@@ -74,6 +74,9 @@ export default function LoginPage() {
           <i className="bi bi-x-lg" aria-hidden="true"></i>
           Salir
         </Link>
+        <Link className="login-register-link" to="/registro">
+          ¿No tienes cuenta? Regístrate como cliente
+        </Link>
       </div>
     </div>
   );
