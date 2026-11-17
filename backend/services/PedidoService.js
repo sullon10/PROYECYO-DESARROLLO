@@ -30,39 +30,7 @@ class PedidoService {
       throw new PedidoError('El pedido debe incluir al menos un producto.');
     }
 
-    // Agrupa líneas repetidas del mismo producto sumando sus cantidades
-    const cantidades = new Map();
-    for (const item of items) {
-      const productoId = Number(item.productoId);
-      const cantidad = Number(item.cantidad);
-      if (!Number.isInteger(productoId) || !Number.isInteger(cantidad) || cantidad <= 0) {
-        throw new PedidoError('Cada producto debe tener un id y una cantidad entera mayor a 0.');
-      }
-      cantidades.set(productoId, (cantidades.get(productoId) || 0) + cantidad);
-    }
-
-    // Nombre y precio salen del catálogo, nunca de lo que envía el cliente
-    const itemsPedido = [];
-    for (const [productoId, cantidad] of cantidades) {
-      let producto;
-      try {
-        producto = this.productoRepo.obtenerPorId(productoId);
-      } catch {
-        throw new PedidoError(`El producto ${productoId} no existe.`, 404);
-      }
-      if (!producto.tieneStockSuficiente(cantidad)) {
-        throw new PedidoError(
-          `Stock insuficiente para "${producto.nombre}" (disponible: ${producto.stock}).`,
-          409
-        );
-      }
-      itemsPedido.push({
-        productoId: producto.id,
-        nombre: producto.nombre,
-        cantidad,
-        precioUnitario: producto.precio,
-      });
-    }
+    const itemsPedido = this._construirItems(items);
 
     const pedido = new Pedido({
       id: this.pedidoRepo.siguienteId(),
@@ -73,6 +41,28 @@ class PedidoService {
     });
 
     this.pedidoRepo.guardar(pedido);
+    return this._presentar(pedido);
+  }
+
+  actualizarPedido(codigo, { clienteId, items }) {
+    this.expirarVencidos();
+    const pedido = this._obtener(codigo);
+
+    if (String(pedido.clienteId) !== String(clienteId)) {
+      throw new PedidoError('No puedes editar un pedido de otro cliente.', 403);
+    }
+    this._exigirEstado(pedido, 'pendiente', 'editar');
+
+    const itemsPedido = this._construirItems(items);
+    pedido.items = itemsPedido.map((item) => ({
+      ...item,
+      subtotal: +(item.cantidad * item.precioUnitario).toFixed(2)
+    }));
+    pedido.total = +pedido.items
+      .reduce((suma, item) => suma + item.subtotal, 0)
+      .toFixed(2);
+
+    this.pedidoRepo.actualizar(pedido);
     return this._presentar(pedido);
   }
 
@@ -108,9 +98,11 @@ class PedidoService {
       .map((p) => this._presentar(p));
   }
 
-  obtenerPorCodigo(codigo) {
+  obtenerPorCodigo(codigo, clienteId) {
     this.expirarVencidos();
-    return this._presentar(this._obtener(codigo));
+    const pedido = this._obtener(codigo);
+    this._exigirPropietario(pedido, clienteId);
+    return this._presentar(pedido);
   }
 
   // ---------- ACCIONES (vendedor) ----------
@@ -141,9 +133,10 @@ class PedidoService {
     return { pedido: this._presentar(pedido), venta };
   }
 
-  cancelarPedido(codigo) {
+  cancelarPedido(codigo, clienteId) {
     this.expirarVencidos();
     const pedido = this._obtener(codigo);
+    this._exigirPropietario(pedido, clienteId);
     this._exigirEstado(pedido, 'pendiente', 'cancelar');
 
     pedido.estado = 'cancelado';
@@ -183,6 +176,43 @@ class PedidoService {
   }
 
   // ---------- PRIVADOS ----------
+  _construirItems(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new PedidoError('El pedido debe incluir al menos un producto.');
+    }
+
+    const cantidades = new Map();
+    for (const item of items) {
+      const productoId = Number(item.productoId);
+      const cantidad = Number(item.cantidad);
+      if (!Number.isInteger(productoId) || !Number.isInteger(cantidad) || cantidad <= 0) {
+        throw new PedidoError('Cada producto debe tener un id y una cantidad entera mayor a 0.');
+      }
+      cantidades.set(productoId, (cantidades.get(productoId) || 0) + cantidad);
+    }
+
+    return [...cantidades].map(([productoId, cantidad]) => {
+      let producto;
+      try {
+        producto = this.productoRepo.obtenerPorId(productoId);
+      } catch {
+        throw new PedidoError(`El producto ${productoId} no existe.`, 404);
+      }
+      if (!producto.tieneStockSuficiente(cantidad)) {
+        throw new PedidoError(
+          `Stock insuficiente para "${producto.nombre}" (disponible: ${producto.stock}).`,
+          409
+        );
+      }
+      return {
+        productoId: producto.id,
+        nombre: producto.nombre,
+        cantidad,
+        precioUnitario: producto.precio
+      };
+    });
+  }
+
   _normalizarCodigo(codigo) {
     const limpio = String(codigo || '').trim().toUpperCase();
     // En el mostrador basta con dictar los 4 dígitos: "4821" equivale a "PED-4821"
@@ -208,6 +238,12 @@ class PedidoService {
       `No se puede ${accion} el pedido ${pedido.codigo}: ${motivos[pedido.estado]}.`,
       409
     );
+  }
+
+  _exigirPropietario(pedido, clienteId) {
+    if (clienteId !== undefined && String(pedido.clienteId) !== String(clienteId)) {
+      throw new PedidoError('No puedes acceder a un pedido de otro cliente.', 403);
+    }
   }
 
   _generarCodigo() {

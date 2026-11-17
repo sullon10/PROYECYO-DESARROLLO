@@ -24,7 +24,7 @@
     "correo": "admin@cafeteria.com",
     "rol": "administrador",
     "estado": true,
-    "contraseña": "$2b$12$QjQ.qX8BwONopM6kgPOUf.OO.b3MVYMaZsLisluT79Z99ZUY2Mf4m"
+    "contraseña": "$2b$10$y3X1edml2YuTGiBdnaIsqOQhGuCpYJTJ4Na1hkDsTBafOITW6JBJG"
   },
   {
     "id": 4,
@@ -33,6 +33,15 @@
     "correo": "dasl@cafeteria.com",
     "rol": "vendedor",
     "estado": true,
-    "contraseña": "$2b$10$cAWFmP1Pa23Aw3vCYSzsl.Qsw8x4mP4WORRZcpXVpihw8OpcUoFlW"
+    "contraseña": "$2b$10$Id3fQQfmWioAlgW34G5hQO4z24eS9xdQf7/p58elLOQEKR4Q5nFR6"
+  },
+  {
+    "id": 5,
+    "nombres": "Cliente",
+    "apellidos": "Demo",
+    "correo": "cliente@cafeteria.com",
+    "rol": "cliente",
+    "estado": true,
+    "contraseña": "$2b$10$CQbpoqtof0wei6dzaueWNO36oUz47owx0j94gJBwmBcOxP8BdAbAy"
   }
 ]
