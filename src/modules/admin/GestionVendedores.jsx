@@ -15,7 +15,8 @@ export default function GestionVendedores() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    nombre: ''
+    nombre: '',
+    contraseña: ''
   });
   const [guardando, setGuardando] = useState(false);
   const [procesandoId, setProcesandoId] = useState(null);
@@ -44,9 +45,13 @@ export default function GestionVendedores() {
     setMensaje('');
 
     try {
-      await crearVendedor(formData.email, formData.nombre);
+      await crearVendedor(
+        formData.email,
+        formData.nombre,
+        formData.contraseña
+      );
 
-      setFormData({ email: '', nombre: '' });
+      setFormData({ email: '', nombre: '', contraseña: '' });
       setShowForm(false);
 
       await cargarVendedores();
@@ -191,6 +196,26 @@ export default function GestionVendedores() {
                       setFormData({
                         ...formData,
                         nombre: e.target.value
+                      })
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">
+                    Contraseña (mínimo 8 caracteres)
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    autoComplete="new-password"
+                    minLength={8}
+                    value={formData.contraseña}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        contraseña: e.target.value
                       })
                     }
                     required
