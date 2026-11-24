@@ -103,5 +103,40 @@
     "fechaEntrega": null,
     "ventaId": null,
     "reactivaciones": 0
+  },
+  {
+    "id": 4,
+    "codigo": "PED-7565",
+    "clienteId": 5,
+    "items": [
+      {
+        "productoId": 3,
+        "nombre": "Jugo de naranja",
+        "cantidad": 1,
+        "precioUnitario": 6,
+        "subtotal": 6
+      },
+      {
+        "productoId": 2,
+        "nombre": "Sandwich mixto",
+        "cantidad": 1,
+        "precioUnitario": 8,
+        "subtotal": 8
+      },
+      {
+        "productoId": 1,
+        "nombre": "Café americano",
+        "cantidad": 1,
+        "precioUnitario": 5.5,
+        "subtotal": 5.5
+      }
+    ],
+    "total": 19.5,
+    "estado": "pendiente",
+    "fechaCreacion": "2026-11-24T21:20:02.125Z",
+    "fechaVencimiento": "2026-11-24T22:20:02.125Z",
+    "fechaEntrega": null,
+    "ventaId": null,
+    "reactivaciones": 0
   }
 ]
