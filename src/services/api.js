@@ -150,7 +150,14 @@ async function request(ruta, opciones = {}) {
   }
 
   if (!res.ok) {
-    throw new Error(data?.error || `Error del servidor (${res.status})`);
+    if (res.status === 401) {
+      window.dispatchEvent(new Event('auth:expired'));
+    }
+    throw new Error(
+      data?.mensaje ||
+      data?.error ||
+      `Error del servidor (${res.status})`
+    );
   }
   return data;
 }
@@ -161,8 +168,8 @@ async function request(ruta, opciones = {}) {
 
 export const obtenerProductos = () => request('/productos');
 
-export const registrarVenta = ({ vendedorId, items }) =>
-  request('/ventas', { method: 'POST', body: JSON.stringify({ vendedorId, items }) });
+export const registrarVenta = ({ items }) =>
+  request('/ventas', { method: 'POST', body: JSON.stringify({ items }) });
 
 export const obtenerHistorialVentas = () => request('/ventas');
 
@@ -183,10 +190,9 @@ export const obtenerPedido = (codigo) =>
 export const obtenerPedidosCliente = (clienteId) =>
   request(`/pedidos/cliente/${clienteId}`);
 
-export const entregarPedido = (codigo, vendedorId) =>
+export const entregarPedido = (codigo) =>
   request(`/pedidos/${encodeURIComponent(codigo)}/entregar`, {
     method: 'PATCH',
-    body: JSON.stringify({ vendedorId }),
   });
 
 export const cancelarPedido = (codigo) =>

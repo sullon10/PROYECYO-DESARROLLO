@@ -7,11 +7,14 @@ class VentaController {
 
   registrar = (req, res) => {
     try {
-      const { vendedorId, items } = req.body;
+      const { items } = req.body;
       if (!items || !items.length) {
         return res.status(400).json({ error: 'Debe incluir al menos un producto' });
       }
-      const venta = this.service.registrarVenta({ vendedorId, items });
+      const venta = this.service.registrarVenta({
+        vendedorId: req.usuario.id,
+        items
+      });
       res.status(201).json(venta);
     } catch (err) {
       res.status(400).json({ error: err.message });

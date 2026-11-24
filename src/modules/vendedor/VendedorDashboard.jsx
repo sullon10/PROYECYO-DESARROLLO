@@ -17,7 +17,7 @@ const TABS = [
 const cap = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
 export default function VendedorDashboard() {
-  const { usuario, logout } = useAuth();
+  const { usuario, logout, turno } = useAuth();
   const {
     pedidos,
     cargando: cargandoPedidos,
@@ -37,6 +37,11 @@ export default function VendedorDashboard() {
   const fechaHoy = cap(
     new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })
   );
+  const horaTurno = (fecha) =>
+    new Date(fecha).toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
   // No activa "cargando" en recargas: así el catálogo no se reinicia tras una venta
   const cargarProductos = useCallback(async () => {
@@ -120,7 +125,7 @@ export default function VendedorDashboard() {
     try {
       setEnviando(true);
       const items = carrito.map((i) => ({ productoId: i.productoId, cantidad: i.cantidad }));
-      await registrarVenta({ vendedorId: usuario.id, items });
+      await registrarVenta({ items });
       setCarrito([]);
       setMensaje({ tipo: 'success', texto: 'Venta registrada correctamente' });
     } catch (err) {
@@ -137,14 +142,22 @@ export default function VendedorDashboard() {
         <div className="container d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center gap-3">
             <div className="vendedor-avatar">
-              {usuario?.nombre?.charAt(0).toUpperCase() || 'V'}
+              {(usuario?.nombres || usuario?.nombre || 'V').charAt(0).toUpperCase()}
             </div>
             <div>
               <small className="text-uppercase opacity-75" style={{ letterSpacing: '0.08em' }}>
                 <i className="bi bi-cup-hot-fill me-1"></i>CafeteriaWeb
               </small>
               <h1 className="h4 mb-0">Panel de Vendedor</h1>
-              <small className="opacity-75">Hola, {usuario?.nombre}</small>
+              <small className="opacity-75 d-block">
+                Hola, {usuario?.nombres || usuario?.nombre || 'Vendedor'}
+              </small>
+              {turno && (
+                <small className="opacity-75 d-block">
+                  Tu turno empezó a las {horaTurno(turno.inicio)} y termina a las{' '}
+                  {horaTurno(turno.fin)}
+                </small>
+              )}
             </div>
           </div>
           <div className="d-flex align-items-center gap-3">

@@ -60,11 +60,7 @@ class PedidoController {
 
   entregar = (req, res) => {
     try {
-      const { vendedorId } = req.body || {};
-      if (vendedorId === undefined || vendedorId === null) {
-        return res.status(400).json({ error: 'Falta el vendedor que entrega el pedido.' });
-      }
-      res.json(this.service.entregarPedido(req.params.codigo, vendedorId));
+      res.json(this.service.entregarPedido(req.params.codigo, req.usuario.id));
     } catch (err) {
       this._error(res, err);
     }

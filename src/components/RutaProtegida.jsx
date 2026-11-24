@@ -3,14 +3,20 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function RutaProtegida({ rolRequerido, children }) {
-  const { usuario, token, cargando } = useAuth();
+  const { usuario, token, cargando, sesionExpirada } = useAuth();
 
   if (cargando) {
     return <p>Cargando...</p>;
   }
 
   if (!usuario || !token) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={sesionExpirada ? { mensaje: 'Tu sesión venció' } : undefined}
+      />
+    );
   }
 
   const normalizarRol = (rol) => {

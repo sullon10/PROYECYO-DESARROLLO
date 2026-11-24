@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import {
   obtenerPedido,
   entregarPedido,
@@ -57,7 +56,6 @@ const hora = (iso) =>
 const fechaHora = (iso) => new Date(iso).toLocaleString('es-PE');
 
 export default function PedidosPanel({ pedidos, cargando, error, onRecargar, onStockCambio }) {
-  const { usuario } = useAuth();
   const [filtro, setFiltro] = useState('pendiente');
   const [busqueda, setBusqueda] = useState('');
   const [seleccionado, setSeleccionado] = useState(null); // código del pedido abierto
@@ -116,7 +114,7 @@ export default function PedidosPanel({ pedidos, cargando, error, onRecargar, onS
 
   const entregar = (p) =>
     ejecutar(
-      () => entregarPedido(p.codigo, usuario.id),
+      () => entregarPedido(p.codigo),
       (r) => `Pedido ${p.codigo} entregado. Venta #${r.venta.id} registrada.`,
       { refrescarStock: true }
     );

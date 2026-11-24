@@ -76,21 +76,44 @@ const registrarCliente = async (req, res) => {
       });
     }
 
-    const existe = usuarioRepository.obtenerTodos().some(
-      (usuario) => usuario.correo.toLowerCase() === correoNormalizado
+    const esVendedor = usuario.rol === 'vendedor';
+    const inicioTurno = Math.floor(Date.now() / 1000);
+    const duracionTurno = 8 * 60 * 60;
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        nombre: usuario.nombres,
+        rol: usuario.rol,
+        ...(esVendedor ? { iat: inicioTurno } : {})
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: esVendedor
+          ? duracionTurno
+          : process.env.JWT_EXPIRES_IN || '2h'
+      }
     );
     if (existe) {
       return res.status(409).json({ mensaje: 'Ya existe una cuenta con ese correo.' });
     }
 
-    const contraseñaHash = await bcrypt.hash(contraseña, 10);
-    const usuario = usuarioRepository.crear({
-      nombres: nombres.trim(),
-      apellidos: String(apellidos).trim(),
-      correo: correoNormalizado,
-      contraseña: contraseñaHash,
-      rol: 'cliente',
-      estado: true
+    res.json({
+      mensaje: 'Inicio de sesión exitoso',
+      token,
+      ...(esVendedor
+        ? {
+            turno: {
+              inicio: new Date(inicioTurno * 1000).toISOString(),
+              fin: new Date((inicioTurno + duracionTurno) * 1000).toISOString()
+            }
+          }
+        : {}),
+      usuario: {
+        id: usuario.id,
+        nombres: usuario.nombres,
+        correo: usuario.correo,
+        rol: usuario.rol
+      }
     });
 
     res.status(201).json({
