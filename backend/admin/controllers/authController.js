@@ -64,20 +64,35 @@ const contraseñaValida = await bcrypt.compare(
       });
     }
 
+    const esVendedor = usuario.rol === 'vendedor';
+    const inicioTurno = Math.floor(Date.now() / 1000);
+    const duracionTurno = 8 * 60 * 60;
     const token = jwt.sign(
       {
         id: usuario.id,
-        rol: usuario.rol
+        nombre: usuario.nombres,
+        rol: usuario.rol,
+        ...(esVendedor ? { iat: inicioTurno } : {})
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || '2h'
+        expiresIn: esVendedor
+          ? duracionTurno
+          : process.env.JWT_EXPIRES_IN || '2h'
       }
     );
 
     res.json({
       mensaje: 'Inicio de sesión exitoso',
       token,
+      ...(esVendedor
+        ? {
+            turno: {
+              inicio: new Date(inicioTurno * 1000).toISOString(),
+              fin: new Date((inicioTurno + duracionTurno) * 1000).toISOString()
+            }
+          }
+        : {}),
       usuario: {
         id: usuario.id,
         nombres: usuario.nombres,
