@@ -6,6 +6,9 @@ import { useAuth } from './context/AuthContext';
 import RutaProtegida from './components/RutaProtegida';
 
 import LoginPage from './pages/LoginPage';
+import RegistroPage from './pages/RegistroPage';
+import InicioPage from './pages/InicioPage';
+import CatalogoPublico from './pages/CatalogoPublico';
 import ClienteDashboard from './modules/cliente/ClienteDashboard';
 import VendedorDashboard from './modules/vendedor/VendedorDashboard';
 
@@ -237,6 +240,13 @@ export default function App() {
       />
 
       <Route
+        path="/registro"
+        element={usuario ? <Navigate to={rutaPorRol()} replace /> : <RegistroPage />}
+      />
+
+      <Route path="/catalogo" element={<CatalogoPublico />} />
+
+      <Route
         path="/admin"
         element={
           <RutaProtegida rolRequerido="admin">
@@ -265,7 +275,11 @@ export default function App() {
 
       <Route
         path="/"
-        element={<Navigate to={rutaPorRol()} replace />}
+        element={
+          usuario
+            ? <Navigate to={rutaPorRol()} replace />
+            : <InicioPage />
+        }
       />
 
       <Route

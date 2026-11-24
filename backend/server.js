@@ -1,5 +1,6 @@
 
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const express = require('express');
 const cors = require('cors');
@@ -39,11 +40,14 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Iniciar servidor
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(
-    `Servidor de CafeteriaWeb corriendo en http://localhost:${PORT}`
-  );
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(
+      `Servidor de CafeteriaWeb corriendo en http://localhost:${PORT}`
+    );
+  });
+}
+
+module.exports = app;

@@ -3,21 +3,21 @@
     "id": 1,
     "nombre": "Café americano",
     "precio": 5.5,
-    "stock": 20,
+    "stock": 19,
     "categoria": "Bebidas"
   },
   {
     "id": 2,
     "nombre": "Sandwich mixto",
     "precio": 8,
-    "stock": 12,
+    "stock": 11,
     "categoria": "Comida"
   },
   {
     "id": 3,
     "nombre": "Jugo de naranja",
     "precio": 6,
-    "stock": 15,
+    "stock": 14,
     "categoria": "Bebidas"
   }
 ]
